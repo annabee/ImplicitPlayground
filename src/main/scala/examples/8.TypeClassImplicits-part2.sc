@@ -6,14 +6,14 @@ case class Dragon(name: String)
 case class DeadDragon(name: String)
 
 trait DragonSlayer[A] {
-  def killDragon(dragonToSlay: Dragon): DeadDragon
+  def killDragon(dragonToSlay: Dragon, killer: A): DeadDragon
 }
 
 // Common functionality moved out
-// plus implict parameters
+// plus implicit parameters
 object KillDragonUtil {
-  def killDragon[A](dragon: Dragon)(implicit dragonSlayer: DragonSlayer[A]): DeadDragon = {
-    dragonSlayer.killDragon(dragon)
+  def killDragon[A](dragon: Dragon, x: A)(implicit dragonSlayer: DragonSlayer[A]): DeadDragon = {
+    dragonSlayer.killDragon(dragon, x)
   }
 }
 
@@ -21,22 +21,22 @@ object KillDragonUtil {
 // make them implicit
 object DragonKillers {
 
-  implicit object Witcher extends DragonSlayer[Witcher] {
-    override def killDragon(dragon: Dragon) = DeadDragon(dragon.name)
+  implicit object WitcherDragonSlayer extends DragonSlayer[Witcher] {
+    def killDragon(dragon: Dragon, witcher: Witcher): DeadDragon = {
+      println(s"I'm a Witcher and I've slayed ${dragon.name}.")
+      DeadDragon(dragon.name)
+    }
   }
-  implicit object Villager extends DragonSlayer[Villager] {
-    override def killDragon(dragon: Dragon) = DeadDragon(dragon.name)
+
+  implicit object VillagerDragonSlayer extends DragonSlayer[Villager] {
+    def killDragon(dragon: Dragon, villager: Villager): DeadDragon = {
+      println(s"I'm a Villager and I've pitchforked ${dragon.name}.")
+      DeadDragon(dragon.name)
+    }
   }
 }
 
 // In another village (package)
 import DragonKillers._
-val deadTrogdor: DeadDragon = KillDragonUtil.killDragon(Dragon("Trogodr"))
-val deadBlinky: DeadDragon = KillDragonUtil.killDragon(Dragon("Blinky"))
-
-
-
-
-
-
-
+val deadTrogdor: DeadDragon = KillDragonUtil.killDragon(Dragon("Trogodr"), Witcher("Geralt"))
+val deadBlinky: DeadDragon = KillDragonUtil.killDragon(Dragon("Blinky"), Villager("Bob"))

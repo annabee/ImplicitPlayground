@@ -12,7 +12,3 @@ object Dragon {
 val trogdor = new Dragon("Trogdor")
 
 trogdor.fly()
-
-
-
-
